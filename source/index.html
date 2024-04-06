@@ -13,6 +13,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  color: #ffff;
   background-color: #000; /* Black background */
 }
 
@@ -50,7 +51,7 @@ header {
   border-radius: 8px; /* Rounded corners */
   border: none;
   padding: 3px 6px;
-  background-color: #000; /* Red background */
+  background-color: #111; /* Red background */
   color: #ffff; /* White text */
 }
 
@@ -58,14 +59,14 @@ header {
   display: block;
   width: 96%;
   margin: 3px auto;
-  background: #900; /* Even darker black background for contrast */
+  background: #111; /* Even darker black background for contrast */
   color: #ffff; /* White text */
   border-radius: 8px; /* Rounded corners */
 }
 
 .prompt {
   color: #ffff; /* White text */
-  background: #900; /* Red background */
+  background: #111; /* Red background */
   padding: 6px;
 }
 
@@ -105,8 +106,8 @@ header {
      
   </div>
   <div id="left">
-    <div id="main" style="padding:12px; max-width:960px color:#ffff">
-       <h3>😈 Welcome back Master! 😈</h3>
+    <div id="main" style="padding:12px; max-width:960px; color:#ffff">
+       <h3 style="color: #ffff;">😈 Welcome back Master! 😈</h3>
        <p class=desktop>Please submit prompt by pressing 
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='enter'" checked>[Enter]</label>
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='ctrl'">[Ctrl-Enter]</label>
