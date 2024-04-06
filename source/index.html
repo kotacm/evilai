@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <head>
-  <title>Chat</title>
+  <title>EvilAI - Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
@@ -43,15 +43,15 @@ header { color:#eee; padding:12px; font-size:20px; height:45px; font-family:"Ope
 </style>
 
 <header>
-  <div id=heading style="float:left">Vanilla ChatGPT<br>
+  <div id=heading style="float:left">EvilAI - The ChatGPT's dark side<br>
     <span id=message style="color:yellow;font-size:10px">
-        <a href="https://github.com/casualwriter/vanilla-chatgpt" target=_NEW>github</a> @20230412
+        
     </span>
   </div>
   <div id=menu style="float:right;">
     <button onclick="chat.recognition()" title="voice input">🎤</button>
     <button onclick="chat.logout()" title="remove API key">Logout</button> 
-    <button onclick="chat.export()" title="export conversation">Export</button>
+    <button onclick="chat.export()" title="export conversation">Export Chat</button>
     <button class=desktop onclick="chat.showPrompts()" title="show prompts">Prompts</button>&nbsp;
     <button id=btnSend accesskey=s onclick="chat.submit()" title="[Alt-S] submit prompt"><b>S</b>end</button>
   </div>
@@ -60,23 +60,11 @@ header { color:#eee; padding:12px; font-size:20px; height:45px; font-family:"Ope
 <div id="content" style="margin:8px;color:#112;background:bed">
   <div id="right">
      <textarea id=prompt rows=3 placeholder="please input prompt here.."></textarea>
-     <div id="list" style="height:calc(100vh - 163px)">
-        <b>Samples of prompt</b>
-        <ul>
-          <li>A quote of today
-          <li>A table for 10 famous artists include name, DOB and style
-          <li>Create an article outline in markdown format for "teamwork"
-          <li>Create a dialogue discussing "the meaning of love"
-          <li>Introduce "vanilla chatGPT"
-          <li>Write a short story about "vanilla chatGPT"
-          <li>Discuss about the pros and cons of "vanilla js"
-          <li>Summarize the following content ...
-        </ul>
-     </div>
+     
   </div>
   <div id="left">
     <div id="main" style="padding:12px; max-width:960px">
-       <h3>Welcome to vanilla-chatgpt.</h3>
+       <h3>😈 Welcome back Master! 😈</h3>
        <p class=desktop>Please submit prompt by pressing 
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='enter'" checked>[Enter]</label>
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='ctrl'">[Ctrl-Enter]</label>
