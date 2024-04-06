@@ -50,7 +50,7 @@ header {
   border-radius: 8px; /* Rounded corners */
   border: none;
   padding: 3px 6px;
-  background-color: #900; /* Red background */
+  background-color: #000; /* Red background */
   color: #ffff; /* White text */
 }
 
@@ -58,7 +58,7 @@ header {
   display: block;
   width: 96%;
   margin: 3px auto;
-  background: #222; /* Even darker black background for contrast */
+  background: #900; /* Even darker black background for contrast */
   color: #ffff; /* White text */
   border-radius: 8px; /* Rounded corners */
 }
@@ -105,13 +105,13 @@ header {
      
   </div>
   <div id="left">
-    <div id="main" style="padding:12px; max-width:960px">
+    <div id="main" style="padding:12px; max-width:960px color:#ffff">
        <h3>😈 Welcome back Master! 😈</h3>
        <p class=desktop>Please submit prompt by pressing 
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='enter'" checked>[Enter]</label>
        <label><input type="radio" name="submitkey" onclick="chat.hotkey='ctrl'">[Ctrl-Enter]</label>
        </p>
-       [Ctrl-P] to print <br>[Export] to export conversation <br>[Logout] to remove API key
+    
     </div>
   </div>
 </div>
