@@ -397,11 +397,6 @@ chat.clipboard = (i) => {
 
 // prompt for API key if not found in localStorage
 window.onload = () => {
-  chat.apiKey = localStorage.getItem('OPENAI_API_KEY');
-  if (!chat.apiKey || chat.apiKey.length < 10 ) {
-     chat.apiKey = prompt("Please input Secret API key (will store in local.storage)", "sk-");
-     localStorage.setItem('OPENAI_API_KEY', chat.apiKey)
-  }
   chat.prompts = chat('list').innerHTML
   chat.showPrompts()
   chat('prompt').focus();
