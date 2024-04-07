@@ -262,40 +262,51 @@ header {
 
 const chat = (id) => window.document.getElementById(id);
 
-// Set the new API endpoint URL
-chat.endPoint = "https://api.binjie.fun/api/generateStream";
+// Set the new API endpoint URL and headers
 chat.headers = {
-  "origin": "https://chat.jinshutuan.com",
-  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.79 Safari/537.36",
-  "Content-Type": "application/json"
-};
-chat.body = {
-  messages: [{ role: "user", content: "" }], // The content will be set in the stream function
-  max_tokens: 820
+  "cache-control": "no-cache",
+  "referer": "https://you.com/search?q=gpt4&tbm=youchat",
+  "cookie": "safesearch_guest=Off; uuid_guest=" + String(Date.now()), // Using timestamp as a simple unique ID
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.79 Safari/537.36"
 };
 chat.history = [];
 
-// stream result from the new API
-chat.stream = function (prompt) {
-  chat.body.messages[0].content = prompt; // Set the user's prompt
-  chat.result = '';
-  chat.controller = new AbortController();
-  const signal = chat.controller.signal;
+// Function to handle the conversation flow
+chat.conversation = async function (prompt) {
+  try {
+    // Send the GET request to the API
+    const response = await fetch("https://you.com/api/streamingSearch", {
+      method: 'GET',
+      headers: chat.headers,
+      params: {
+        "q": prompt,
+        "page": 1,
+        "count": 10,
+        "safeSearch": "Off",
+        "onShoppingPage": false,
+        "mkt": "",
+        "responseFilter": "WebPages,Translations,TimeZone,Computation,RelatedSearches",
+        "domain": "youchat",
+        "queryTraceId": String(Date.now()), // Using timestamp as a simple unique ID
+        "chat": []
+      }
+    });
 
-  // Include the history in the request
-  for (let i = chat.history.length - 1; i >= 0 && i > (chat.history.length - 3); i--) {
-    chat.body.messages.unshift({ role: 'assistant', content: chat.history[i].result });
-    chat.body.messages.unshift({ role: 'user', content: chat.history[i].prompt });
+    if (!response.ok) {
+      throw new Error('Network response was not ok.');
+    }
+
+    const textResponse = await response.text();
+    const youChatToken = textResponse.match(/{"youChatToken": "(.*?)"/)[1]
+      .replace("\\n", "\n")
+      .replace("\\\\", "\\")
+      .replace('\\"', '"');
+
+    // Handle the response
+    chat.onmessage(youChatToken);
+  } catch (error) {
+    chat.onerror(error);
   }
-
-  fetch(chat.endPoint, { method: 'POST', headers: chat.headers, body: JSON.stringify(chat.body), signal })
-    .then(response => response.text())
-    .then(text => {
-      chat.result = text;
-      chat.onmessage(chat.result);
-      chat.oncomplete(chat.result);
-    })
-    .catch(error => chat.onerror(error));
 };
 
 // default error handle
@@ -316,6 +327,9 @@ chat.export = (fname) => {
   link.download = fname || ('chat-' + new Date().toISOString().substr(0, 16)) + '.md';
   link.click();
 };
+
+// ... other parts of the script ...
+  
   
 
 
