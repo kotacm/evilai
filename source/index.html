@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Votre Application de Chat IA</title>
+<title>EvilAI - Chat</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-
 body, html {
 	width: 100%;
 	height: 100vh;
@@ -15,8 +14,11 @@ body, html {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	color: white; /* Ajout de la couleur blanche pour le texte */
+	font-family: Arial, sans-serif; /* Spécification de la police Arial */
 }
 
+/* ... (le reste du CSS reste inchangé) ... */
 .chat-container {
 	width: 100%;
 	max-width: 800px;
@@ -96,15 +98,15 @@ body, html {
 
 <script>
 const OPENROUTER_API_KEY = 'votre_clé_api';
-const YOUR_SITE_URL = 'l_url_de_votre_site';
-const YOUR_APP_NAME = 'le_nom_de_votre_application';
+const YOUR_SITE_URL = 'https://ai.evils.in';
+const YOUR_APP_NAME = 'EvilAI';
 
 function sendMessage() {
   const inputField = document.getElementById('userInput');
   const userMessage = inputField.value;
   inputField.value = '';
 
-  displayMessage(userMessage, 'user');
+  displayMessage('👤 User: ' + userMessage, 'user'); // Ajout du préfixe "User:"
 
   fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -124,7 +126,7 @@ function sendMessage() {
   .then(response => response.json())
   .then(data => {
     const aiContent = data.choices[0].message.content;
-    displayMessage(aiContent, 'ai');
+    displayMessage('😈 EvilAI: ' + aiContent, 'ai'); // Ajout du préfixe "AI:" et affichage de la réponse
   })
   .catch(error => console.error('Error:', error));
 }
