@@ -1,465 +1,143 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-  <title>EvilAI - Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Votre Application de Chat IA</title>
 <style>
-body {
-  font-family: Roboto, Lato, Arial;
-  line-height: 1.5;
-  font-size: 16px;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  color: #ffff;
-  background-color: #000; /* Black background */
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body, html {
+	width: 100%;
+	height: 100vh;
+	background: #2B2A33;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-header {
-  background: linear-gradient(to bottom right, #111, #111); /* Red gradient */
-  color: #ffff; /* White text */
-  padding: 12px;
-  font-size: 20px;
-  height: 45px;
-  font-family: "Open Sans";
-  border-radius: 8px; /* Rounded corners */
+.chat-container {
+	width: 100%;
+	max-width: 800px;
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	height: 90%;
+	justify-content: space-between;
+	border-radius: 15px;
+	background: #1C1B22;
 }
 
-#left, #right, #prompt, #list, .markdown code, .markdown pre, .markdown blockquote, .markdown table, .markdown th, .markdown td {
-  border: none; /* No borders */
-  border-radius: 8px; /* Rounded corners */
+.messages {
+	flex: 1;
+	padding: 20px;
+	overflow-y: auto;
 }
 
-#left {
-  float: left;
-  width: calc(60vw - 30px);
-  height: calc(100vh - 100px);
-  background-color: #111; /* Darker black background for contrast */
+.input-area {
+	padding: 15px;
+	background: #000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-#right {
-  float: right;
-  width: 40%;
-  height: calc(100vh - 100px);
-  background-color: #111; /* Darker black background for contrast */
+.input {
+	width: calc(100% - 110px);
+	height: 40px;
+	background: #1C1B22;
+	border: 1px solid #1C1B22;
+	border-radius: 8px;
+	padding: 15px;
+	color: #B3C1C3;
+	font-family: Roboto;
+	transition: .1s;
+	cursor: default;
+	font-size: 15px;
 }
 
-#menu button {
-  font-family: Lato, arial;
-  border-radius: 8px; /* Rounded corners */
-  border: none;
-  padding: 3px 6px;
-  background-color: #111; /* Red background */
-  color: #ffff; /* White text */
+.input:hover {
+	box-shadow: 0 0 0 2px #0060DF;
 }
 
-#right textarea {
-  display: block;
-  width: 96%;
-  margin: 3px auto;
-  background: #111; /* Even darker black background for contrast */
-  color: #ffff; /* White text */
-  border-radius: 8px; /* Rounded corners */
+.btn-1 {
+	width: 90px;
+	height: 40px;
+	background: #1C1B22;
+	border: 1px solid #1C1B22;
+	border-radius: 5px;
+	color: #B3C1C3;
+	font-family: Roboto;
+	transition: .1s;
+	cursor: default;
+	font-size: 15.5px;
 }
 
-.prompt {
-  color: #ffff; /* White text */
-  background: #111; /* Red background */
-  padding: 6px;
+.btn-1:hover {
+	box-shadow: 0 0 0 2px #0060DF;
+	transform: scale(1.05);
 }
 
-@media print{
-  #menu, #right { display:none!important }
-  #left { position:relative; width:100%; left:0px; top:0px; border:none; height:auto; overflow:hidden }
-  .prompt { border-bottom: 1px solid grey }
-}
-
-@media screen and (max-width: 880px) {
-  #list, .desktop { display:none!important }
-  #right { position:absolute; width:auto; height:auto; bottom:10px; left:8px; right:70px }
-  #right textarea { height:1.2em; padding:10px; overflow:auto }
-  #btnSend { position:absolute; height:36px; bottom:12px; right:12px; }
-  #left	 { width:97%; height:calc(100vh - 154px);  }
+.btn-1:focus {
+	transform: scale(0.95);
 }
 </style>
+</head>
+<body>
 
-<header>
-  <div id=heading style="float:left">EvilAI - The ChatGPT's dark side<br>
-    <span id=message style="color:yellow;font-size:10px">
-        
-    </span>
-  </div>
-  <div id=menu style="float:right;">
-    <button onclick="chat.recognition()" title="voice input">🎤</button>
-    <button onclick="chat.logout()" title="remove API key">Logout</button> 
-    <button onclick="chat.export()" title="export conversation">Export Chat</button>
-    <button class=desktop onclick="chat.showPrompts()" title="show prompts">Prompts</button>&nbsp;
-    <button id=btnSend accesskey=s onclick="chat.submit()" title="[Alt-S] submit prompt"><b>S</b>end</button>
-  </div>
-</header>
-
-<div id="content" style="margin:8px;color:#112;background:bed">
-  <div id="right">
-     <textarea id=prompt rows=3 placeholder="please input prompt here.."></textarea>
-     
-  </div>
-  <div id="left">
-    <div id="main" style="padding:12px; max-width:960px; color:#ffff">
-       <h3 style="color: #ffff;">😈 Welcome back Master! 😈</h3>
-       <p class=desktop>Please submit prompt by pressing 
-       <label><input type="radio" name="submitkey" onclick="chat.hotkey='enter'" checked>[Enter]</label>
-       <label><input type="radio" name="submitkey" onclick="chat.hotkey='ctrl'">[Ctrl-Enter]</label>
-       </p>
-    
-    </div>
+<div class="chat-container">
+  <div class="messages" id="messages"></div>
+  <div class="input-area">
+    <input type="text" id="userInput" class="input" placeholder="Tapez votre message ici...">
+    <button class="btn-1" onclick="sendMessage()">Envoyer</button>
   </div>
 </div>
 
 <script>
-/*****************************************************************************
- * casual-markdown - a lightweight regexp-base markdown parser with TOC support
- * last updated on 2023/03/27, v0.91, some refinement for chatgpt markdown
- *
- * Copyright (c) 2022-2023, Casualwriter (MIT Licensed)
- * https://github.com/casualwriter/casual-markdown
-*****************************************************************************/
-  // define md object, and extent function (which is a dummy function)
-  const md = { yaml:{}, before: function (str) {return str}, after: function (str) {return str} }
+const OPENROUTER_API_KEY = 'votre_clé_api';
+const YOUR_SITE_URL = 'l_url_de_votre_site';
+const YOUR_APP_NAME = 'le_nom_de_votre_application';
 
-  // function for REGEXP to convert html tag. ie. <TAG> => &lt;TAG*gt;  
-  md.formatTag = function (html) { return html.replace(/</g,'&lt;').replace(/\>/g,'&gt;'); }
+function sendMessage() {
+  const inputField = document.getElementById('userInput');
+  const userMessage = inputField.value;
+  inputField.value = '';
 
-  //===== format code-block, highlight remarks/keywords for code/sql
-  md.formatCode = function (match, title, block) {
-    // convert tag <> to &lt; &gt; tab to 3 space, support marker using ^^^
-    block = block.replace(/</g,'&lt;').replace(/\>/g,'&gt;')
-    block = block.replace(/\t/g,'   ').replace(/\^\^\^(.+?)\^\^\^/g, '<mark>$1</mark>')
-    
-    // highlight comment and keyword based on title := none | sql | code
-    if (title.toLowerCase(title) == 'sql') {
-      block = block.replace(/^\-\-(.*)/gm,'<rem>--$1</rem>').replace(/\s\-\-(.*)/gm,' <rem>--$1</rem>')   
-      block = block.replace(/(\s?)(function|procedure|return|if|then|else|end|loop|while|or|and|case|when)(\s)/gim,'$1<b>$2</b>$3')
-      block = block.replace(/(\s?)(select|update|delete|insert|create|from|where|group by|having|set)(\s)/gim,'$1<b>$2</b>$3')
-    } else if ((title||'none')!=='none') {
-      block = block.replace(/^\/\/(.*)/gm,'<rem>//$1</rem>').replace(/\s\/\/(.*)/gm,' <rem>//$1</rem>')   
-      block = block.replace(/(\s?)(function|procedure|return|if|then|else|end|loop|while|or|and|case|when)(\s)/gim,'$1<b>$2</b>$3')
-      block = block.replace(/(\s?)(var|let|const|for|next|do|while|loop|continue|break|switch|try|catch|finally)(\s)/gim,'$1<b>$2</b>$3')
-    }
-    return '<pre title="' + title + '"><button onclick="md.clipboard(this)">copy</button><code>'  + block + '</code></pre>'
-  }
-  
-  //===== parse markdown string into HTML string (exclude code-block)
-  md.parser = function( mdstr ) {
-  
-    // apply yaml variables
-    for (var name in this.yaml) mdstr = mdstr.replace( new RegExp('\{\{\\s*'+name+'\\s*\}\}', 'gm'), this.yaml[name] )
-    
-    // table syntax
-    mdstr = mdstr.replace(/\n(.+?)\n.*?\-\-\s?\|\s?\-\-.*?\n([\s\S]*?)\n\s*?\n/g, function (m,p1,p2) {
-        var thead = p1.replace(/^\|(.+)/gm,'$1').replace(/(.+)\|$/gm,'$1').replace(/\|/g,'<th>')
-        var tbody = p2.replace(/^\|(.+)/gm,'$1').replace(/(.+)\|$/gm,'$1')
-        tbody = tbody.replace(/(.+)/gm,'<tr><td>$1</td></tr>').replace(/\|/g,'<td>')
-        return '\n<table>\n<thead>\n<th>' + thead + '\n</thead>\n<tbody>' + tbody + '\n</tbody></table>\n\n' 
-    } )   
+  displayMessage(userMessage, 'user');
 
-    // horizontal rule => <hr> 
-    mdstr = mdstr.replace(/^-{3,}|^\_{3,}|^\*{3,}$/gm, '<hr>').replace(/\n\n<hr\>/g, '\n<br><hr>')
-
-    // header => <h1>..<h5> 
-    mdstr = mdstr.replace(/^##### (.*?)\s*#*$/gm, '<h5>$1</h5>')
-              .replace(/^#### (.*?)\s*#*$/gm, '<h4>$1</h4>')
-              .replace(/^### (.*?)\s*#*$/gm, '<h3>$1</h3>')
-              .replace(/^## (.*?)\s*#*$/gm, '<h2>$1</h2>')
-              .replace(/^# (.*?)\s*#*$/gm, '<h1>$1</h1>')
-              .replace(/^<h(\d)\>(.*?)\s*{(.*)}\s*<\/h\d\>$/gm, '<h$1 id="$3">$2</h$1>')
-        
-    // inline code-block: `code-block` => <code>code-block</code>    
-    mdstr = mdstr.replace(/``(.*?)``/gm, function(m,p){ return '<code>' + md.formatTag(p).replace(/`/g,'&#96;') + '</code>'} ) 
-    mdstr = mdstr.replace(/`(.*?)`/gm, '<code>$1</code>' )
-        
-    // blockquote, max 2 levels => <blockquote>{text}</blockquote>
-    mdstr = mdstr.replace(/^\>\> (.*$)/gm, '<blockquote><blockquote>$1</blockquote></blockquote>')
-    mdstr = mdstr.replace(/^\> (.*$)/gm, '<blockquote>$1</blockquote>')
-    mdstr = mdstr.replace(/<\/blockquote\>\n<blockquote\>/g, '\n<br>' )
-    mdstr = mdstr.replace(/<\/blockquote\>\n<br\><blockquote\>/g, '\n<br>' )
-                  
-    // image syntax: ![title](url) => <img alt="title" src="url" />          
-    mdstr = mdstr.replace(/!\[(.*?)\]\((.*?) "(.*?)"\)/gm, '<img alt="$1" src="$2" $3 />')
-    mdstr = mdstr.replace(/!\[(.*?)\]\((.*?)\)/gm, '<img alt="$1" src="$2" width="90%" />')
-                  
-    // links syntax: [title "title"](url) => <a href="url" title="title">text</a>          
-    mdstr = mdstr.replace(/\[(.*?)\]\((.*?) "new"\)/gm, '<a href="$2" target=_new>$1</a>')
-    mdstr = mdstr.replace(/\[(.*?)\]\((.*?) "(.*?)"\)/gm, '<a href="$2" title="$3">$1</a>')
-    mdstr = mdstr.replace(/([<\s])(https?\:\/\/.*?)([\s\>])/gm, '$1<a href="$2">$2</a>$3')
-    mdstr = mdstr.replace(/\[(.*?)\]\(\)/gm, '<a href="$1">$1</a>')
-    mdstr = mdstr.replace(/\[(.*?)\]\((.*?)\)/gm, '<a href="$2">$1</a>')
-                  
-    // unordered/ordered list, max 2 levels  => <ul><li>..</li></ul>, <ol><li>..</li></ol>
-    mdstr = mdstr.replace(/^[\*+-][ .](.*)/gm, '<ul><li>$1</li></ul>' )
-    mdstr = mdstr.replace(/^\d\d?[ .](.*)/gm, '<ol><li>$1</li></ol>' )
-    mdstr = mdstr.replace(/^\s{2,6}[\*+-][ .](.*)/gm, '<ul><ul><li>$1</li></ul></ul>' )
-    mdstr = mdstr.replace(/^\s{2,6}\d[ .](.*)/gm, '<ul><ol><li>$1</li></ol></ul>' )
-    mdstr = mdstr.replace(/<\/[ou]l\>\n\n?<[ou]l\>/g, '\n' )
-    mdstr = mdstr.replace(/<\/[ou]l\>\n<[ou]l\>/g, '\n' )
-                  
-    // text decoration: bold, italic, underline, strikethrough, highlight                
-    mdstr = mdstr.replace(/\*\*\*(\w.*?[^\\])\*\*\*/gm, '<b><em>$1</em></b>')
-    mdstr = mdstr.replace(/\*\*(\w.*?[^\\])\*\*/gm, '<b>$1</b>')
-    mdstr = mdstr.replace(/\*(\w.*?[^\\])\*/gm, '<em>$1</em>')
-    mdstr = mdstr.replace(/___(\w.*?[^\\])___/gm, '<b><em>$1</em></b>')
-    mdstr = mdstr.replace(/__(\w.*?[^\\])__/gm, '<u>$1</u>')
-    // mdstr = mdstr.replace(/_(\w.*?[^\\])_/gm, '<u>$1</u>')  // NOT support!! 
-    mdstr = mdstr.replace(/\^\^\^(.+?)\^\^\^/gm, '<mark>$1</mark>')
-    mdstr = mdstr.replace(/\^\^(\w.*?)\^\^/gm, '<ins>$1</ins>')
-    mdstr = mdstr.replace(/~~(\w.*?)~~/gm, '<del>$1</del>')
-                  
-    // line break and paragraph => <br/> <p>                
-    mdstr = mdstr.replace(/  \n/g, '\n<br/>').replace(/\n\s*\n/g, '\n<p>\n')
-        
-    // indent as code-block          
-    mdstr = mdstr.replace(/^ {4,10}(.*)/gm, function(m,p) { return '<pre><code>' + md.formatTag(p) + '</code></pre>'} )
-    mdstr = mdstr.replace(/^\t(.*)/gm, function(m,p) { return '<pre><code>' + md.formatTag(p) + '</code></pre>'} )
-    mdstr = mdstr.replace(/<\/code\><\/pre\>\n<pre\><code\>/g, '\n' )
-
-    // Escaping Characters                
-    return mdstr.replace(/\\([`_~\*\+\-\.\^\\\<\>\(\)\[\]])/gm, '$1' )
-  }
-
-  //===== parse markdown string into HTML content (cater code-block)
-  md.html = function (mdText) { 
-    // replace \r\n to \n, and handle front matter for simple YAML
-    mdText = mdText.replace(/\r\n/g, '\n').replace( /^---+\s*\n([\s\S]*?)\n---+\s*\n/, md.formatYAML )
-    // handle code-block.
-    mdText = mdText.replace(/\n~~~/g,'\n```').replace(/\n``` *(.*?)\n([\s\S]*?)\n``` *\n/g, md.formatCode)
-    
-    // split by "<code>", skip for code-block and process normal text
-    var pos1=0, pos2=0, mdHTML = ''
-    while ( (pos1 = mdText.indexOf('<code>')) >= 0 ) {
-      pos2 = mdText.indexOf('</code>', pos1 )
-      mdHTML += md.after( md.parser( md.before( mdText.substr(0,pos1) ) ) )
-      mdHTML += mdText.substr(pos1, (pos2>0? pos2-pos1+7 : mdtext.length) )
-      mdText = mdText.substr( pos2 + 7 )
-    }
-
-    return '<div class="markdown">' + mdHTML + md.after( md.parser( md.before(mdText) ) ) + '</div>'
-  }
-  
-  md.clipboard = (e) => {
-    navigator.clipboard.writeText( e.parentNode.innerText.replace('copy\n','') )
-    e.innerText = 'copied'
-  }
-//============= end of casual-markdown-parser===================
-
-/*****************************************************************************
-* vanilla-chatgpt.js - chat library for openai-chatgpt
-* last updated on 2023/03/28, v0.60, basic chat, responsive, print-friendly, export.
-*
-* Copyright (c) 2023, Casualwriter (MIT Licensed)
-* https://github.com/casualwriter/vanilla-chatgpt
-*****************************************************************************/
-
-const chat = (id) => window.document.getElementById(id);
-
-// Set the new API endpoint URL
-chat.endPoint = "https://api.binjie.fun/api/generateStream";
-chat.headers = {
-  "origin": "https://chat.jinshutuan.com",
-  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.79 Safari/537.36",
-  "Content-Type": "application/json"
-};
-chat.body = {
-  messages: [{ role: "user", content: "" }], // The content will be set in the stream function
-  max_tokens: 820
-};
-chat.history = [];
-
-// stream result from the new API
-// Votre clé API OpenRouter
-const OPENROUTER_API_KEY = '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';
-
-// L'URL de votre site
-const YOUR_SITE_URL = 'https://ia.evils.in';
-
-// Le nom de votre site
-const YOUR_SITE_NAME = 'EvilAI - Unlimited GPT';
-
-// Fonction pour envoyer une requête à l'API OpenRouter
-chat.stream = function (prompt) {
-  this.body.messages[0].content = prompt; // Définir le message de l'utilisateur
-  this.result = '';
-  this.controller = new AbortController();
-  const signal = this.controller.signal;
-
-  // Inclure l'historique dans la requête
-  for (let i = this.history.length - 1; i >= 0 && i > (this.history.length - 3); i--) {
-    this.body.messages.unshift({ role: 'assistant', content: this.history[i].result });
-    this.body.messages.unshift({ role: 'user', content: this.history[i].prompt });
-  }
-
-  fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
+  fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
     headers: {
-      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-      "HTTP-Referer": YOUR_SITE_URL,
-      "X-Title": YOUR_SITE_NAME,
-      "Content-Type": "application/json"
+      'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+      'HTTP-Referer': `${YOUR_SITE_URL}`,
+      'X-Title': `${YOUR_APP_NAME}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      "model": "undi95/toppy-m-7b:free",
-      "messages": this.body.messages,
-    }),
-    signal
+      model: 'undi95/toppy-m-7b:free',
+      messages: [
+        { role: 'user', content: userMessage },
+      ]
+    })
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
+  .then(response => response.json())
   .then(data => {
-    this.onmessage(data.choices[0].message.content);
-    this.oncomplete(data.choices[0].message.content);
+    const aiContent = data.choices[0].message.content;
+    displayMessage(aiContent, 'ai');
   })
-  .catch(error => this.onerror(error));
-};
-
-// default error handle
-chat.onerror = (error) => { alert(error); };
-
-// clear API key when logout
-chat.logout = () => {
-  if (confirm('Logout and clear API Key?')) localStorage.clear();
-};
-
-// export conversation
-chat.export = (fname) => {
-  const link = document.createElement('a');
-  link.href = 'data:text/plain;charset=utf-8,';
-  chat.history.forEach((x) => {
-    link.href += encodeURIComponent('### ' + x.prompt + '\n\n' + x.result + '\n\n');
-  });
-  link.download = fname || ('chat-' + new Date().toISOString().substr(0, 16)) + '.md';
-  link.click();
-};
-  
-
-
-//================= main program ===================
-// display result when receiving message
-chat.onmessage = function (text) {
-  document.getElementById("message").innerHTML = 'receiving messages..';
-  document.getElementById("receiving").innerHTML = md.html(text + '<br><br>');
-};
-
-// show whole conversation when message completed
-chat.oncomplete = (text) => {
-  let html1='', html2=''
-  chat("message").innerHTML = `(model: ${chat.model})`
-  chat.history.push( { prompt: chat.prompt, result: chat.result } )
-  
-  for (let i=0; i<chat.history.length; i++) {
-     html1 += '<h4 class=prompt id=prompt'+i+' ondblclick="chat.clipboard('+i+')" title="doubleclick to copy">' 
-     html1 += chat.history[i].prompt + '</h4>\n' + chat.history[i].result + '\n\n'
-     html2 += '<li onclick="location=this.title" title="#prompt' + i + '">' + chat.history[i].prompt
-  }
-  
-  html1 += '<div><button style="float:left" onclick="chat.redo()">Redo</button>'
-  html1 += '<button style="float:right" onclick="chat.speak()">🔊 speak</button>'
-  
-  chat("main").innerHTML = md.html(html1) + '<br></div>'
-  chat("list").innerHTML = html2
-  chat("left").scrollTop = chat("left").scrollHeight;
-  chat("btnSend").innerHTML = '<b>S</b>end'
-  
-  if (document.body.clientWidth > 800) {
-    chat('prompt').select()
-    chat('prompt').focus();
-  } else {
-    chat('prompt').value = ''
-  }  
+  .catch(error => console.error('Error:', error));
 }
 
-// abort fetch request.
-chat.abort = () => { 
-  chat.controller.abort()
-  chat("receiving").innerHTML += '\n<font color=red>Message Aborted!</font>'
-  chat("receiving").id = 'abort';
-};
-
-// submit prompt
-chat.submit = () => {
-  if (chat("btnSend").innerText === 'Stop..') {
-    chat.abort()
-    chat("btnSend").innerText = 'Send'
-  } else {
-    chat.stream( chat.prompt = chat('prompt').value )
-    chat("main").innerHTML += '<h4 class=prompt>' + chat.prompt + '</h4>\n<div id=receiving>Receiving....</div>'
-    chat("left").scrollTop = chat("left").scrollHeight;
-    chat("btnSend").innerText = 'Stop..'
-  }  
+function displayMessage(message, sender) {
+  const messagesContainer = document.getElementById('messages');
+  const messageDiv = document.createElement('div');
+  messageDiv.textContent = message;
+  messageDiv.className = sender;
+  messagesContainer.appendChild(messageDiv);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
-
-// show default prompt list
-chat.showPrompts = () => {
-  chat('list').innerHTML = chat.prompts
-  document.querySelectorAll('#list li').forEach( (element) => {
-    element.addEventListener('click', (event) => {
-      chat('prompt').value = element.innerText
-      chat('prompt').focus();
-    });
-  })
-};
-
-chat.clipboard = (i) => {
-  navigator.clipboard.writeText( '### '+ chat.history[i].prompt + '\n\n' + chat.history[i].result )
-  chat("message").innerText = 'dialogue has been copied to clipboard'
-}
-
-// prompt for API key if not found in localStorage
-window.onload = () => {
-  chat.prompts = chat('list').innerHTML
-  chat.showPrompts()
-  chat('prompt').focus();
-}
-
-// add submit hot-key of ctrl-enter
-document.addEventListener('keydown', function(event) {
-  if ( event.key==='Enter' && (chat.hotkey!='ctrl'||event.ctrlKey)) {
-    if (chat("btnSend").innerText === 'Send') { 
-      event.preventDefault(); chat.submit(); 
-    }
-  }  
-});
-
-// [20230412] redo. submit latest prompt
-chat.redo = () => {
-  chat.history.pop()
-  chat('prompt').value = chat.prompt
-  chat.submit()
-}
-
-// speak the latest answer
-chat.speak = (i)  => {
-  if (window.speechSynthesis.speaking) {
-     window.speechSynthesis.cancel();
-  } else {
-    i = ( i>=0? i : chat.history.length-1 )
-    const utterance = new SpeechSynthesisUtterance(chat.history[i].result);
-    utterance.rate = 1.5;
-    window.speechSynthesis.speak(utterance);
-  }
-}
-
-// voice recognition
-var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
-chat.speech = new SpeechRecognition();
-
-chat.speech.onresult = e => chat('prompt').value = e.results[0][0].transcript;
-
-chat.recognition = () => {
-  chat.speech.start()
-  chat('prompt').value = 'Listening...'
-}   
 </script>
+
+</body>
+</html>
