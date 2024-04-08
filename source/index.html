@@ -349,9 +349,9 @@ chat.export = (fname) => {
 //================= main program ===================
 // display result when receiving message
 chat.onmessage = function (text) {
-  chat("message").innerHTML = 'receiving messages..'
-  chat("receiving").innerHTML = md.html(text + '<br><br>');
-}
+  document.getElementById("message").innerHTML = 'receiving messages..';
+  document.getElementById("receiving").innerHTML = md.html(text + '<br><br>');
+};
 
 // show whole conversation when message completed
 chat.oncomplete = (text) => {
