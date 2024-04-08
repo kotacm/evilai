@@ -276,26 +276,53 @@ chat.body = {
 chat.history = [];
 
 // stream result from the new API
-chat.stream = function (prompt) {
-  chat.body.messages[0].content = prompt; // Set the user's prompt
-  chat.result = '';
-  chat.controller = new AbortController();
-  const signal = chat.controller.signal;
+// Votre clé API OpenRouter
+const OPENROUTER_API_KEY = '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';
 
-  // Include the history in the request
-  for (let i = chat.history.length - 1; i >= 0 && i > (chat.history.length - 3); i--) {
-    chat.body.messages.unshift({ role: 'assistant', content: chat.history[i].result });
-    chat.body.messages.unshift({ role: 'user', content: chat.history[i].prompt });
+// L'URL de votre site
+const YOUR_SITE_URL = 'https://votre-domaine.com';
+
+// Le nom de votre site
+const YOUR_SITE_NAME = 'EvilAI - Unlimited GPT';
+
+// Fonction pour envoyer une requête à l'API OpenRouter
+chat.stream = function (prompt) {
+  this.body.messages[0].content = prompt; // Définir le message de l'utilisateur
+  this.result = '';
+  this.controller = new AbortController();
+  const signal = this.controller.signal;
+
+  // Inclure l'historique dans la requête
+  for (let i = this.history.length - 1; i >= 0 && i > (this.history.length - 3); i--) {
+    this.body.messages.unshift({ role: 'assistant', content: this.history[i].result });
+    this.body.messages.unshift({ role: 'user', content: this.history[i].prompt });
   }
 
-  fetch(chat.endPoint, { method: 'POST', headers: chat.headers, body: JSON.stringify(chat.body), signal })
-    .then(response => response.text())
-    .then(text => {
-      chat.result = text;
-      chat.onmessage(chat.result);
-      chat.oncomplete(chat.result);
-    })
-    .catch(error => chat.onerror(error));
+  fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+      "HTTP-Referer": YOUR_SITE_URL,
+      "X-Title": YOUR_SITE_NAME,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "model": "undi95/toppy-m-7b:free",
+      "messages": this.body.messages,
+    }),
+    signal
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    this.onmessage(data.choices[0].message.content);
+    this.oncomplete(data.choices[0].message.content);
+  })
+  .catch(error => this.onerror(error));
 };
 
 // default error handle
